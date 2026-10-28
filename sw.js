@@ -1,5 +1,4 @@
-// Subí el número de versión cada vez que cambies archivos de la app para forzar la actualización
-const CACHE = 'stock-cantos-v4';
+const CACHE = 'stock-cantos-v5';
 const LOCAL = [
   './',
   './index.html',
@@ -11,12 +10,16 @@ const LOCAL = [
   './icons/apple-touch-icon.png'
 ];
 
-// Sitios externos que sí se guardan para uso sin conexión (código y estilos).
-// Las conexiones de Firebase (datos e ingreso) NO pasan por acá.
+// Estos sitios externos se guardan para uso sin conexión.
+// Las conexiones de Firebase (datos e ingreso) no pasan por acá.
 const EXTERNOS = ['www.gstatic.com', 'cdn.tailwindcss.com', 'cdnjs.cloudflare.com'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(LOCAL)).then(() => self.skipWaiting()));
+  e.waitUntil(
+    caches.open(CACHE)
+      .then(c => c.addAll(LOCAL.map(u => new Request(u, { cache: 'reload' }))))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', e => {
@@ -35,21 +38,23 @@ self.addEventListener('fetch', e => {
   const propio = url.origin === self.location.origin;
   if (!propio && !EXTERNOS.includes(url.hostname)) return;
 
-  // Página: primero red (para recibir actualizaciones), si no hay conexión usa la copia guardada
-  if (req.mode === 'navigate') {
+  // Archivos de la app: primero internet (siempre la versión nueva), si no hay señal usa la copia guardada
+  if (propio) {
     e.respondWith(
-      fetch(req)
+      fetch(req, { cache: 'no-cache' })
         .then(res => {
-          const copia = res.clone();
-          caches.open(CACHE).then(c => c.put('./index.html', copia));
+          if (res && res.ok) {
+            const copia = res.clone();
+            caches.open(CACHE).then(c => c.put(req, copia));
+          }
           return res;
         })
-        .catch(() => caches.match('./index.html'))
+        .catch(() => caches.match(req).then(r => r || caches.match('./index.html')))
     );
     return;
   }
 
-  // Resto: usa la copia guardada y la actualiza en segundo plano
+  // Librerías externas: copia guardada y se actualiza en segundo plano
   e.respondWith(
     caches.match(req).then(cacheada => {
       const red = fetch(req)
