@@ -1,5 +1,5 @@
 // Subí el número de versión cada vez que cambies archivos de la app para forzar la actualización
-const CACHE = 'stock-cantos-v3';
+const CACHE = 'stock-cantos-v4';
 const LOCAL = [
   './',
   './index.html',
