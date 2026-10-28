@@ -1,4 +1,3 @@
-js
 export const firebaseConfig = {
   apiKey: "AIzaSyBp7ZYgILYrkNlW93d-Y1trxBI6MBK80cs",
   authDomain: "stock-cantos.firebaseapp.com",
