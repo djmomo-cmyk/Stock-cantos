@@ -1,4 +1,4 @@
-const CACHE = 'stock-cantos-v5';
+const CACHE = 'stock-cantos-v6';
 const LOCAL = [
   './',
   './index.html',

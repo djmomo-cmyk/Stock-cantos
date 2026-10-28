@@ -66,8 +66,8 @@
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <button onclick="abrirModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 shadow-md active:scale-95 transition-all">
-            <i class="fa-solid fa-plus"></i> Nuevo Canto
+          <button onclick="agregarSegunVista()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 shadow-md active:scale-95 transition-all">
+            <i class="fa-solid fa-plus"></i> Agregar
           </button>
           <button onclick="cerrarSesion()" title="Cerrar sesión" class="text-slate-400 hover:text-white p-2">
             <i class="fa-solid fa-right-from-bracket"></i>
@@ -89,45 +89,78 @@
       </div>
 
       <!-- Tarjetas Resumen -->
-      <div class="grid grid-cols-3 gap-2 text-center">
-        <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl shadow">
-          <p class="text-xs text-slate-400 font-medium">Rollos</p>
-          <p id="stat-total-rollos" class="text-xl font-black text-amber-400 mt-1">0</p>
+      <div class="space-y-2">
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl shadow">
+            <p class="text-xs text-slate-400 font-medium">Rollos canto</p>
+            <p id="stat-total-rollos" class="text-xl font-black text-amber-400 mt-1">0</p>
+          </div>
+          <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl shadow">
+            <p class="text-xs text-slate-400 font-medium">Metros canto</p>
+            <p id="stat-total-metros" class="text-xl font-black text-emerald-400 mt-1">0m</p>
+          </div>
+          <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl shadow">
+            <p class="text-xs text-slate-400 font-medium">Canto bajo</p>
+            <p id="stat-stock-bajo" class="text-xl font-black text-rose-400 mt-1">0</p>
+          </div>
         </div>
-        <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl shadow">
-          <p class="text-xs text-slate-400 font-medium">Total Metros</p>
-          <p id="stat-total-metros" class="text-xl font-black text-emerald-400 mt-1">0m</p>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl shadow">
+            <p class="text-xs text-slate-400 font-medium">Tipos placa</p>
+            <p id="stat-placas-tipos" class="text-xl font-black text-amber-400 mt-1">0</p>
+          </div>
+          <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl shadow">
+            <p class="text-xs text-slate-400 font-medium">Total placas</p>
+            <p id="stat-placas-total" class="text-xl font-black text-emerald-400 mt-1">0</p>
+          </div>
+          <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl shadow">
+            <p class="text-xs text-slate-400 font-medium">Placa baja</p>
+            <p id="stat-placas-bajo" class="text-xl font-black text-rose-400 mt-1">0</p>
+          </div>
         </div>
-        <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl shadow">
-          <p class="text-xs text-slate-400 font-medium">Stock Bajo</p>
-          <p id="stat-stock-bajo" class="text-xl font-black text-rose-400 mt-1">0</p>
-        </div>
+      </div>
+
+      <!-- Vista: todo / cantos / placas -->
+      <div class="grid grid-cols-3 gap-1 bg-slate-800 border border-slate-700 rounded-xl p-1 text-xs">
+        <button onclick="cambiarVista('todo')" id="vista-todo" class="py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold">Todo</button>
+        <button onclick="cambiarVista('placas')" id="vista-placas" class="py-1.5 rounded-lg text-slate-300 font-medium">Placas</button>
+        <button onclick="cambiarVista('cantos')" id="vista-cantos" class="py-1.5 rounded-lg text-slate-300 font-medium">Cantos</button>
       </div>
 
       <!-- Buscador y Filtros -->
       <div class="space-y-2">
         <div class="relative">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-sm"></i>
-          <input type="text" id="input-buscar" oninput="renderizar()" placeholder="Buscar por color, marca o veta..." class="w-full pl-9 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-amber-500 text-slate-100 placeholder-slate-400">
+          <input type="text" id="input-buscar" oninput="renderizar()" placeholder="Buscar color, marca, material o estante..." class="w-full pl-9 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-amber-500 text-slate-100 placeholder-slate-400">
         </div>
 
         <div class="flex gap-2 overflow-x-auto pb-1 text-xs no-scrollbar">
           <button onclick="filtrar('todos')" id="filtro-todos" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold whitespace-nowrap">Todos</button>
-          <button onclick="filtrar('0.4')" id="filtro-0.4" class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-medium whitespace-nowrap">0.4 mm</button>
-          <button onclick="filtrar('1')" id="filtro-1" class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-medium whitespace-nowrap">1 mm</button>
-          <button onclick="filtrar('2')" id="filtro-2" class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-medium whitespace-nowrap">2 mm</button>
+          <button onclick="filtrar('0.4')" id="filtro-0.4" class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-medium whitespace-nowrap">Canto 0.4 mm</button>
+          <button onclick="filtrar('1')" id="filtro-1" class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-medium whitespace-nowrap">Canto 1 mm</button>
+          <button onclick="filtrar('2')" id="filtro-2" class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-medium whitespace-nowrap">Canto 2 mm</button>
           <button onclick="filtrar('alerta')" id="filtro-alerta" class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-rose-400 font-medium whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Poco stock</button>
         </div>
       </div>
 
+      <!-- Resultado de la búsqueda: ¿tengo placa y canto de este color? -->
+      <div id="resumen-busqueda" class="hidden bg-slate-800 border border-slate-700 rounded-xl p-3 space-y-2"></div>
+
+      <!-- Lista de Placas -->
+      <section id="seccion-placas" class="space-y-3">
+        <h2 id="titulo-placas" class="text-xs font-bold text-slate-400 uppercase tracking-wider"></h2>
+        <div id="lista-placas" class="space-y-3"></div>
+      </section>
+
       <!-- Lista de Cantos -->
-      <div id="lista-cantos" class="space-y-3">
-        <!-- Los cantos se cargan dinámicamente con JavaScript -->
-      </div>
+      <section id="seccion-cantos" class="space-y-3">
+        <h2 id="titulo-cantos" class="text-xs font-bold text-slate-400 uppercase tracking-wider"></h2>
+        <div id="lista-cantos" class="space-y-3"></div>
+      </section>
 
       <!-- Copia de seguridad -->
       <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 space-y-2">
-        <p class="text-xs text-slate-400 font-medium"><i class="fa-solid fa-shield-halved mr-1 text-amber-500"></i>Copia de seguridad</p>
+        <p class="text-xs text-slate-400 font-medium"><i class="fa-solid fa-shield-halved mr-1 text-amber-500"></i>Copia de seguridad (placas y cantos)</p>
         <div class="grid grid-cols-2 gap-2">
           <button onclick="exportarDatos()" class="py-2 bg-slate-700 hover:bg-slate-600 active:scale-95 rounded-lg font-bold text-xs text-slate-200 border border-slate-600 transition-all">
             <i class="fa-solid fa-download mr-1"></i> Exportar
@@ -141,9 +174,25 @@
 
     </main>
 
+    <!-- Modal: elegir qué agregar -->
+    <div id="modal-elegir" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-xs p-5 space-y-3 shadow-2xl">
+        <div class="flex justify-between items-center">
+          <h3 class="font-bold text-lg text-amber-400">¿Qué querés agregar?</h3>
+          <button onclick="cerrarElegir()" class="text-slate-400 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+        <button onclick="cerrarElegir(); abrirModalPlaca()" class="w-full py-3 bg-amber-500 hover:bg-amber-600 rounded-xl font-bold text-sm text-slate-950 active:scale-95 transition-all">
+          <i class="fa-solid fa-border-all mr-1"></i> Placa
+        </button>
+        <button onclick="cerrarElegir(); abrirModal()" class="w-full py-3 bg-slate-700 hover:bg-slate-600 rounded-xl font-bold text-sm text-slate-100 border border-slate-600 active:scale-95 transition-all">
+          <i class="fa-solid fa-layer-group mr-1"></i> Canto
+        </button>
+      </div>
+    </div>
+
     <!-- Modal para Agregar / Editar Canto -->
     <div id="modal-canto" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md p-5 space-y-4 shadow-2xl">
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md p-5 space-y-4 shadow-2xl max-h-[95vh] overflow-y-auto">
         <div class="flex justify-between items-center border-b border-slate-700 pb-3">
           <h3 id="modal-titulo" class="font-bold text-lg text-amber-400">Nuevo Canto</h3>
           <button onclick="cerrarModal()" class="text-slate-400 hover:text-white p-1">
@@ -204,6 +253,70 @@
         </form>
       </div>
     </div>
+
+    <!-- Modal para Agregar / Editar Placa -->
+    <div id="modal-placa" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md p-5 space-y-4 shadow-2xl max-h-[95vh] overflow-y-auto">
+        <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+          <h3 id="modal-placa-titulo" class="font-bold text-lg text-amber-400">Nueva Placa</h3>
+          <button onclick="cerrarModalPlaca()" class="text-slate-400 hover:text-white p-1">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <form id="form-placa" onsubmit="guardarPlaca(event)" class="space-y-3">
+          <input type="hidden" id="placa-id">
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Color / Diseño / Veta *</label>
+            <input type="text" id="placa-color" required placeholder="Ej: Blanco Puro, Roble Americano" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Material</label>
+              <input type="text" id="placa-material" placeholder="Ej: Melamina, MDF" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Espesor (mm)</label>
+              <input type="number" id="placa-espesor" value="18" min="0" step="0.5" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Medida (m)</label>
+            <input type="text" id="placa-medida" value="2.75 x 1.83" placeholder="Ej: 2.75 x 1.83" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Cantidad de placas *</label>
+              <input type="number" id="placa-cantidad" required step="1" min="0" placeholder="Ej: 12" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Alerta Mínimo (u.)</label>
+              <input type="number" id="placa-minimo" value="3" min="0" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Marca / Proveedor</label>
+              <input type="text" id="placa-marca" placeholder="Ej: Egger, Faplac" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Ubicación / Estante</label>
+              <input type="text" id="placa-ubicacion" placeholder="Ej: Depósito B" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+            </div>
+          </div>
+
+          <div class="pt-2 flex gap-2">
+            <button type="button" onclick="cerrarModalPlaca()" class="w-1/2 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-bold text-sm text-slate-200">Cancelar</button>
+            <button type="submit" class="w-1/2 py-2 bg-amber-500 hover:bg-amber-600 rounded-lg font-bold text-sm text-slate-950">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 
   <script type="module">
@@ -219,7 +332,7 @@
 
     // ---------- Firebase ----------
     const configurado = firebaseConfig && firebaseConfig.apiKey && !String(firebaseConfig.apiKey).startsWith('PEGAR');
-    let auth = null, db = null, colRef = null;
+    let auth = null, db = null, colCantos = null, colPlacas = null;
 
     if (configurado) {
       const app = initializeApp(firebaseConfig);
@@ -230,15 +343,21 @@
       } catch (e) {
         db = getFirestore(app);
       }
-      colRef = collection(db, 'cantos');
+      colCantos = collection(db, 'cantos');
+      colPlacas = collection(db, 'placas');
     }
 
     // ---------- Estado ----------
     let cantos = [];
+    let placas = [];
+    let vista = 'todo';
     let filtroActual = 'todos';
-    let cancelarSnapshot = null;
-    let hayPendientes = false;
+    let cancelarSnapshots = [];
+    let pendientesCantos = false;
+    let pendientesPlacas = false;
     let migracionRevisada = false;
+
+    const ESPESORES_CANTO = ['0.4', '1', '2'];
 
     function mostrar(pantalla) {
       $('pantalla-carga').classList.toggle('hidden', pantalla !== 'carga');
@@ -259,7 +378,7 @@
     function avisarError(e) {
       console.error(e);
       if (e && e.code === 'permission-denied') {
-        alert('No tenés permiso para modificar el stock. Revisá las reglas de Firestore y que tu correo esté en la lista.');
+        alert('No tenés permiso para modificar el stock. Revisá las reglas de Firestore (tienen que incluir "cantos" y "placas") y que tu correo esté en la lista.');
       } else {
         alert('No se pudo guardar el cambio. Revisá la conexión e intentá de nuevo.');
       }
@@ -277,8 +396,9 @@
           mostrar('app');
           iniciarSincronizacion();
         } else {
-          if (cancelarSnapshot) { cancelarSnapshot(); cancelarSnapshot = null; }
+          detenerSincronizacion();
           cantos = [];
+          placas = [];
           migracionRevisada = false;
           mostrar('login');
         }
@@ -316,26 +436,45 @@
     }
 
     // ---------- Sincronización en tiempo real ----------
+    function detenerSincronizacion() {
+      cancelarSnapshots.forEach(f => f());
+      cancelarSnapshots = [];
+    }
+
+    function errorSnapshot(err) {
+      console.error(err);
+      $('estado-sync').textContent = err.code === 'permission-denied' ? 'Sin permiso (revisá las reglas)' : 'Error de sincronización';
+      $('estado-sync').className = 'text-[10px] text-rose-400 leading-tight';
+    }
+
     function iniciarSincronizacion() {
-      if (cancelarSnapshot) cancelarSnapshot();
-      cancelarSnapshot = onSnapshot(colRef, { includeMetadataChanges: true }, snap => {
+      detenerSincronizacion();
+
+      cancelarSnapshots.push(onSnapshot(colCantos, { includeMetadataChanges: true }, snap => {
         cantos = snap.docs.map(d => {
           const c = d.data();
           return { ...c, id: d.id, metros: Math.max(0, parseFloat(c.metros) || 0) };
         });
         cantos.sort((a, b) => (b.creado || 0) - (a.creado || 0));
-        hayPendientes = snap.metadata.hasPendingWrites;
+        pendientesCantos = snap.metadata.hasPendingWrites;
         actualizarEstado();
         renderizar();
         if (!migracionRevisada && !snap.metadata.fromCache) {
           migracionRevisada = true;
           revisarMigracion(snap.empty);
         }
-      }, err => {
-        console.error(err);
-        $('estado-sync').textContent = err.code === 'permission-denied' ? 'Sin permiso (revisá las reglas)' : 'Error de sincronización';
-        $('estado-sync').className = 'text-[10px] text-rose-400 leading-tight';
-      });
+      }, errorSnapshot));
+
+      cancelarSnapshots.push(onSnapshot(colPlacas, { includeMetadataChanges: true }, snap => {
+        placas = snap.docs.map(d => {
+          const p = d.data();
+          return { ...p, id: d.id, cantidad: Math.max(0, parseFloat(p.cantidad) || 0) };
+        });
+        placas.sort((a, b) => (b.creado || 0) - (a.creado || 0));
+        pendientesPlacas = snap.metadata.hasPendingWrites;
+        actualizarEstado();
+        renderizar();
+      }, errorSnapshot));
     }
 
     function actualizarEstado() {
@@ -343,7 +482,7 @@
       if (!navigator.onLine) {
         el.textContent = '● Sin conexión (se sincroniza al volver)';
         el.className = 'text-[10px] text-amber-400 leading-tight';
-      } else if (hayPendientes) {
+      } else if (pendientesCantos || pendientesPlacas) {
         el.textContent = '● Sincronizando...';
         el.className = 'text-[10px] text-amber-400 leading-tight';
       } else {
@@ -376,7 +515,7 @@
       const locales = leerLocal();
       localStorage.setItem('stock_cantos_migracion', 'hecho');
       $('banner-migracion').classList.add('hidden');
-      escribirLote(normalizarLista(locales).map(c => ({ tipo: 'set', ref: doc(colRef), data: c })));
+      escribirLote(normalizarCantos(locales).map(c => ({ tipo: 'set', ref: doc(colCantos), data: c })));
     }
 
     function omitirMigracion() {
@@ -399,7 +538,7 @@
       cadena.catch(avisarError);
     }
 
-    function normalizarLista(lista) {
+    function normalizarCantos(lista) {
       const base = Date.now();
       return lista
         .filter(c => c && typeof c === 'object' && c.color !== undefined && !isNaN(parseFloat(c.metros)))
@@ -415,46 +554,180 @@
         }));
     }
 
-    // ---------- Pantalla ----------
-    function renderizar() {
-      const lista = $('lista-cantos');
-      const busqueda = $('input-buscar').value.toLowerCase();
-      lista.innerHTML = '';
+    function normalizarPlacas(lista) {
+      const base = Date.now();
+      return lista
+        .filter(p => p && typeof p === 'object' && p.color !== undefined && !isNaN(parseFloat(p.cantidad)))
+        .map((p, i) => ({
+          color: String(p.color),
+          material: String(p.material ?? ''),
+          espesor: String(p.espesor ?? '18'),
+          medida: String(p.medida ?? ''),
+          cantidad: parseFloat(p.cantidad),
+          minimo: isNaN(parseFloat(p.minimo)) ? 3 : parseFloat(p.minimo),
+          marca: String(p.marca ?? ''),
+          ubicacion: String(p.ubicacion ?? ''),
+          creado: base - i
+        }));
+    }
 
-      let totalMetros = 0;
-      let stockBajoCount = 0;
+    // ---------- Búsqueda ----------
+    function coincideTexto(item, busqueda) {
+      if (!busqueda) return true;
+      return [item.color, item.marca, item.ubicacion, item.material]
+        .some(v => v && String(v).toLowerCase().includes(busqueda));
+    }
 
-      const filtrados = cantos.filter(c => {
-        const coincideText =
-          String(c.color).toLowerCase().includes(busqueda) ||
-          (c.marca && String(c.marca).toLowerCase().includes(busqueda)) ||
-          (c.ubicacion && String(c.ubicacion).toLowerCase().includes(busqueda));
-
-        let coincideFiltro = true;
-        if (filtroActual === '0.4') coincideFiltro = String(c.espesor) === '0.4';
-        else if (filtroActual === '1') coincideFiltro = String(c.espesor) === '1';
-        else if (filtroActual === '2') coincideFiltro = String(c.espesor) === '2';
-        else if (filtroActual === 'alerta') coincideFiltro = parseFloat(c.metros) <= parseFloat(c.minimo);
-
-        return coincideText && coincideFiltro;
-      });
-
-      // Las estadísticas cuentan todo el stock, no solo lo filtrado
-      cantos.forEach(c => {
-        totalMetros += parseFloat(c.metros) || 0;
-        if (parseFloat(c.metros) <= parseFloat(c.minimo)) stockBajoCount++;
-      });
-
-      $('stat-total-rollos').innerText = cantos.length;
-      $('stat-total-metros').innerText = Math.round(totalMetros) + 'm';
-      $('stat-stock-bajo').innerText = stockBajoCount;
-
-      if (filtrados.length === 0) {
-        lista.innerHTML = `<div class="text-center py-10 text-slate-500 text-sm">No se encontraron rollos de canto.</div>`;
+    function renderResumenBusqueda(busquedaOriginal, busqueda) {
+      const caja = $('resumen-busqueda');
+      if (!busqueda) {
+        caja.classList.add('hidden');
+        caja.innerHTML = '';
         return;
       }
+      const placasOk = placas.filter(p => coincideTexto(p, busqueda));
+      const cantosOk = cantos.filter(c => coincideTexto(c, busqueda));
+      const unidades = placasOk.reduce((s, p) => s + (parseFloat(p.cantidad) || 0), 0);
+      const metros = cantosOk.reduce((s, c) => s + (parseFloat(c.metros) || 0), 0);
+      const tienePlaca = unidades > 0;
+      const tieneCanto = metros > 0;
 
-      filtrados.forEach(c => {
+      const textoPlaca = tienePlaca
+        ? `${unidades} placa${unidades === 1 ? '' : 's'}${placasOk.length > 1 ? ` (${placasOk.length} tipos)` : ''}`
+        : 'Sin placa';
+      const textoCanto = tieneCanto
+        ? `${Math.round(metros * 10) / 10} m de canto${cantosOk.length > 1 ? ` (${cantosOk.length} rollos)` : ''}`
+        : 'Sin canto';
+
+      const estilo = ok => ok
+        ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-300'
+        : 'bg-rose-500/10 border-rose-500/40 text-rose-300';
+
+      caja.innerHTML = `
+        <p class="text-xs text-slate-400">Resultado para "<span class="text-white font-semibold">${esc(busquedaOriginal.trim())}</span>"</p>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="border rounded-lg p-2 text-xs font-bold ${estilo(tienePlaca)}">
+            <i class="fa-solid ${tienePlaca ? 'fa-circle-check' : 'fa-circle-xmark'} mr-1"></i>${esc(textoPlaca)}
+          </div>
+          <div class="border rounded-lg p-2 text-xs font-bold ${estilo(tieneCanto)}">
+            <i class="fa-solid ${tieneCanto ? 'fa-circle-check' : 'fa-circle-xmark'} mr-1"></i>${esc(textoCanto)}
+          </div>
+        </div>`;
+      caja.classList.remove('hidden');
+    }
+
+    // ---------- Pantalla ----------
+    function renderizar() {
+      const busquedaOriginal = $('input-buscar').value;
+      const busqueda = busquedaOriginal.trim().toLowerCase();
+
+      // Estadísticas: siempre cuentan todo el stock
+      let totalMetros = 0, cantoBajo = 0, totalPlacas = 0, placaBaja = 0;
+      cantos.forEach(c => {
+        totalMetros += parseFloat(c.metros) || 0;
+        if (parseFloat(c.metros) <= parseFloat(c.minimo)) cantoBajo++;
+      });
+      placas.forEach(p => {
+        totalPlacas += parseFloat(p.cantidad) || 0;
+        if (parseFloat(p.cantidad) <= parseFloat(p.minimo)) placaBaja++;
+      });
+      $('stat-total-rollos').innerText = cantos.length;
+      $('stat-total-metros').innerText = Math.round(totalMetros) + 'm';
+      $('stat-stock-bajo').innerText = cantoBajo;
+      $('stat-placas-tipos').innerText = placas.length;
+      $('stat-placas-total').innerText = Math.round(totalPlacas * 10) / 10;
+      $('stat-placas-bajo').innerText = placaBaja;
+
+      renderResumenBusqueda(busquedaOriginal, busqueda);
+
+      const espesorActivo = ESPESORES_CANTO.includes(filtroActual);
+      const verPlacas = vista !== 'cantos' && !espesorActivo;
+      const verCantos = vista !== 'placas';
+      $('seccion-placas').classList.toggle('hidden', !verPlacas);
+      $('seccion-cantos').classList.toggle('hidden', !verCantos);
+
+      if (verPlacas) {
+        const filtradas = placas.filter(p => {
+          if (!coincideTexto(p, busqueda)) return false;
+          if (filtroActual === 'alerta') return parseFloat(p.cantidad) <= parseFloat(p.minimo);
+          return true;
+        });
+        $('titulo-placas').textContent = `Placas (${filtradas.length})`;
+        renderListaPlacas(filtradas);
+      }
+
+      if (verCantos) {
+        const filtrados = cantos.filter(c => {
+          if (!coincideTexto(c, busqueda)) return false;
+          if (ESPESORES_CANTO.includes(filtroActual)) return String(c.espesor) === filtroActual;
+          if (filtroActual === 'alerta') return parseFloat(c.metros) <= parseFloat(c.minimo);
+          return true;
+        });
+        $('titulo-cantos').textContent = `Cantos (${filtrados.length})`;
+        renderListaCantos(filtrados);
+      }
+    }
+
+    function renderListaPlacas(lista) {
+      const cont = $('lista-placas');
+      cont.innerHTML = '';
+      if (lista.length === 0) {
+        cont.innerHTML = `<div class="text-center py-6 text-slate-500 text-sm">No se encontraron placas.</div>`;
+        return;
+      }
+      lista.forEach(p => {
+        const esBajo = parseFloat(p.cantidad) <= parseFloat(p.minimo);
+        const item = document.createElement('div');
+        item.className = `bg-slate-800 border ${esBajo ? 'border-rose-500/50' : 'border-slate-700'} p-4 rounded-xl shadow-md space-y-3`;
+        const detalle = [p.marca || 'Sin marca', p.material].filter(Boolean).map(esc).join(' • ');
+        item.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <i class="fa-solid fa-border-all text-amber-500 text-sm"></i>
+                <h4 class="font-bold text-white text-base">${esc(p.color)}</h4>
+                ${esBajo ? '<span class="bg-rose-500/20 text-rose-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-rose-500/30">STOCK BAJO</span>' : ''}
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5">${detalle} • Ubicación: ${esc(p.ubicacion) || 'General'}</p>
+            </div>
+            <div class="flex gap-1">
+              <button onclick="editarPlaca('${esc(p.id)}')" class="text-slate-400 hover:text-amber-400 p-1.5"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button onclick="eliminarPlaca('${esc(p.id)}')" class="text-slate-400 hover:text-rose-400 p-1.5"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+            <div class="flex gap-2 text-xs flex-wrap">
+              ${p.espesor ? `<span class="bg-slate-800 text-amber-400 px-2 py-1 rounded font-semibold border border-slate-700">${esc(p.espesor)} mm</span>` : ''}
+              ${p.medida ? `<span class="bg-slate-800 text-slate-300 px-2 py-1 rounded font-semibold border border-slate-700">${esc(p.medida)}</span>` : ''}
+            </div>
+            <div class="text-right">
+              <span class="text-lg font-black ${esBajo ? 'text-rose-400' : 'text-emerald-400'}">${esc(p.cantidad)} u.</span>
+              <span class="text-[10px] text-slate-500 block">mín: ${esc(p.minimo)}</span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-1 gap-2">
+            <span class="text-xs text-slate-400 font-medium">Descontar uso:</span>
+            <div class="flex gap-1.5">
+              <button onclick="descontarPlaca('${esc(p.id)}', 1)" class="bg-slate-700 hover:bg-slate-600 active:scale-95 text-slate-200 text-xs px-2.5 py-1 rounded-lg font-bold border border-slate-600">-1</button>
+              <button onclick="descontarPlaca('${esc(p.id)}', 2)" class="bg-slate-700 hover:bg-slate-600 active:scale-95 text-slate-200 text-xs px-2.5 py-1 rounded-lg font-bold border border-slate-600">-2</button>
+              <button onclick="descontarPlacaPersonalizado('${esc(p.id)}')" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 active:scale-95 text-xs px-2.5 py-1 rounded-lg font-bold border border-amber-500/30">Otro</button>
+            </div>
+          </div>
+        `;
+        cont.appendChild(item);
+      });
+    }
+
+    function renderListaCantos(lista) {
+      const cont = $('lista-cantos');
+      cont.innerHTML = '';
+      if (lista.length === 0) {
+        cont.innerHTML = `<div class="text-center py-6 text-slate-500 text-sm">No se encontraron rollos de canto.</div>`;
+        return;
+      }
+      lista.forEach(c => {
         const esBajo = parseFloat(c.metros) <= parseFloat(c.minimo);
         const item = document.createElement('div');
         item.className = `bg-slate-800 border ${esBajo ? 'border-rose-500/50' : 'border-slate-700'} p-4 rounded-xl shadow-md space-y-3`;
@@ -463,6 +736,7 @@
           <div class="flex justify-between items-start">
             <div>
               <div class="flex items-center gap-2 flex-wrap">
+                <i class="fa-solid fa-layer-group text-amber-500 text-sm"></i>
                 <h4 class="font-bold text-white text-base">${esc(c.color)}</h4>
                 ${esBajo ? '<span class="bg-rose-500/20 text-rose-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-rose-500/30">STOCK BAJO</span>' : ''}
               </div>
@@ -484,7 +758,6 @@
             </div>
           </div>
 
-          <!-- Botones de Descuento Rápido -->
           <div class="flex items-center justify-between pt-1 gap-2">
             <span class="text-xs text-slate-400 font-medium">Descontar uso:</span>
             <div class="flex gap-1.5">
@@ -494,21 +767,49 @@
             </div>
           </div>
         `;
-        lista.appendChild(item);
+        cont.appendChild(item);
       });
+    }
+
+    function cambiarVista(nueva) {
+      vista = nueva;
+      ['todo', 'placas', 'cantos'].forEach(v => {
+        $(`vista-${v}`).className = v === nueva
+          ? 'py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold'
+          : 'py-1.5 rounded-lg text-slate-300 font-medium';
+      });
+      // Los filtros de espesor son de canto: se ocultan en la vista de placas
+      ESPESORES_CANTO.forEach(e => $(`filtro-${e}`).classList.toggle('hidden', nueva === 'placas'));
+      if (nueva === 'placas' && ESPESORES_CANTO.includes(filtroActual)) {
+        filtrar('todos');
+      } else {
+        renderizar();
+      }
     }
 
     function filtrar(tipo) {
       filtroActual = tipo;
       document.querySelectorAll('[id^="filtro-"]').forEach(btn => {
         const esAlerta = btn.id === 'filtro-alerta';
-        btn.className = `px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 ${esAlerta ? 'text-rose-400' : 'text-slate-300'} font-medium whitespace-nowrap`;
+        const oculto = btn.classList.contains('hidden');
+        btn.className = `px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 ${esAlerta ? 'text-rose-400' : 'text-slate-300'} font-medium whitespace-nowrap${oculto ? ' hidden' : ''}`;
       });
       const btnActivo = $(`filtro-${tipo}`);
       if (btnActivo) btnActivo.className = 'px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold whitespace-nowrap';
       renderizar();
     }
 
+    function agregarSegunVista() {
+      if (vista === 'placas') abrirModalPlaca();
+      else if (vista === 'cantos') abrirModal();
+      else $('modal-elegir').classList.remove('hidden');
+    }
+
+    function cerrarElegir() {
+      $('modal-elegir').classList.add('hidden');
+    }
+
+    // ---------- Cantos ----------
     // Descontar usa "increment": si los dos descuentan a la vez, se suman ambos descuentos
     function descontar(id, cantidad) {
       updateDoc(doc(db, 'cantos', id), { metros: increment(-cantidad) }).catch(avisarError);
@@ -563,8 +864,7 @@
         ubicacion: $('canto-ubicacion').value.trim(),
         creado: existente && existente.creado ? existente.creado : Date.now()
       };
-
-      const ref = id ? doc(db, 'cantos', id) : doc(colRef);
+      const ref = id ? doc(db, 'cantos', id) : doc(colCantos);
       setDoc(ref, datos).catch(avisarError);
       cerrarModal();
     }
@@ -577,11 +877,85 @@
       }
     }
 
+    // ---------- Placas ----------
+    function descontarPlaca(id, cantidad) {
+      updateDoc(doc(db, 'placas', id), { cantidad: increment(-cantidad) }).catch(avisarError);
+    }
+
+    function descontarPlacaPersonalizado(id) {
+      const placa = placas.find(p => p.id === id);
+      if (!placa) return;
+      const cant = prompt(`¿Cuántas placas usaste de ${placa.color}?`, '1');
+      if (cant === null) return;
+      const n = parseFloat(String(cant).replace(',', '.'));
+      if (!isNaN(n) && n > 0) descontarPlaca(id, n);
+    }
+
+    function abrirModalPlaca(id = null) {
+      $('modal-placa').classList.remove('hidden');
+      if (id) {
+        const p = placas.find(item => item.id === id);
+        if (!p) return;
+        $('modal-placa-titulo').innerText = 'Editar Placa';
+        $('placa-id').value = p.id;
+        $('placa-color').value = p.color;
+        $('placa-material').value = p.material || '';
+        $('placa-espesor').value = p.espesor || '';
+        $('placa-medida').value = p.medida || '';
+        $('placa-cantidad').value = p.cantidad;
+        $('placa-minimo').value = p.minimo;
+        $('placa-marca').value = p.marca || '';
+        $('placa-ubicacion').value = p.ubicacion || '';
+      } else {
+        $('modal-placa-titulo').innerText = 'Nueva Placa';
+        $('form-placa').reset();
+        $('placa-id').value = '';
+      }
+    }
+
+    function cerrarModalPlaca() {
+      $('modal-placa').classList.add('hidden');
+    }
+
+    function guardarPlaca(e) {
+      e.preventDefault();
+      const id = $('placa-id').value;
+      const minimo = parseFloat($('placa-minimo').value);
+      const existente = id ? placas.find(p => p.id === id) : null;
+      const datos = {
+        color: $('placa-color').value.trim(),
+        material: $('placa-material').value.trim(),
+        espesor: $('placa-espesor').value,
+        medida: $('placa-medida').value.trim(),
+        cantidad: parseFloat($('placa-cantidad').value),
+        minimo: isNaN(minimo) ? 3 : minimo,
+        marca: $('placa-marca').value.trim(),
+        ubicacion: $('placa-ubicacion').value.trim(),
+        creado: existente && existente.creado ? existente.creado : Date.now()
+      };
+      const ref = id ? doc(db, 'placas', id) : doc(colPlacas);
+      setDoc(ref, datos).catch(avisarError);
+      cerrarModalPlaca();
+    }
+
+    function editarPlaca(id) { abrirModalPlaca(id); }
+
+    function eliminarPlaca(id) {
+      if (confirm('¿Eliminar esta placa del stock?')) {
+        deleteDoc(doc(db, 'placas', id)).catch(avisarError);
+      }
+    }
+
     // ---------- Copia de seguridad ----------
     function exportarDatos() {
       const fecha = new Date().toISOString().slice(0, 10);
-      const limpios = cantos.map(({ id, ...resto }) => ({ id, ...resto }));
-      const contenido = JSON.stringify({ app: 'stock-cantos', version: 2, exportado: new Date().toISOString(), cantos: limpios }, null, 2);
+      const contenido = JSON.stringify({
+        app: 'stock-cantos',
+        version: 3,
+        exportado: new Date().toISOString(),
+        cantos,
+        placas
+      }, null, 2);
       const blob = new Blob([contenido], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -602,15 +976,28 @@
       lector.onload = () => {
         try {
           const datos = JSON.parse(lector.result);
-          const lista = Array.isArray(datos) ? datos : datos.cantos;
-          if (!Array.isArray(lista)) throw new Error('formato');
-          const validos = normalizarLista(lista);
-          if (validos.length === 0) throw new Error('vacio');
+          // Acepta copias viejas (solo una lista de cantos) y las nuevas (cantos + placas)
+          const listaCantos = Array.isArray(datos) ? datos : datos.cantos;
+          const listaPlacas = !Array.isArray(datos) ? datos.placas : null;
+          const nuevosCantos = Array.isArray(listaCantos) ? normalizarCantos(listaCantos) : [];
+          const nuevasPlacas = Array.isArray(listaPlacas) ? normalizarPlacas(listaPlacas) : [];
+          if (nuevosCantos.length === 0 && nuevasPlacas.length === 0) throw new Error('vacio');
 
-          if (confirm(`Se van a reemplazar los ${cantos.length} cantos actuales por ${validos.length} del archivo, para los dos usuarios. ¿Continuar?`)) {
-            const borrar = cantos.map(c => ({ tipo: 'delete', ref: doc(db, 'cantos', c.id) }));
-            const crear = validos.map(c => ({ tipo: 'set', ref: doc(colRef), data: c }));
-            escribirLote([...borrar, ...crear]);
+          const partes = [];
+          if (nuevosCantos.length) partes.push(`los ${cantos.length} cantos actuales por ${nuevosCantos.length} del archivo`);
+          if (nuevasPlacas.length) partes.push(`las ${placas.length} placas actuales por ${nuevasPlacas.length} del archivo`);
+
+          if (confirm(`Se van a reemplazar ${partes.join(' y ')}, para los dos usuarios. ¿Continuar?`)) {
+            const ops = [];
+            if (nuevosCantos.length) {
+              cantos.forEach(c => ops.push({ tipo: 'delete', ref: doc(db, 'cantos', c.id) }));
+              nuevosCantos.forEach(c => ops.push({ tipo: 'set', ref: doc(colCantos), data: c }));
+            }
+            if (nuevasPlacas.length) {
+              placas.forEach(p => ops.push({ tipo: 'delete', ref: doc(db, 'placas', p.id) }));
+              nuevasPlacas.forEach(p => ops.push({ tipo: 'set', ref: doc(colPlacas), data: p }));
+            }
+            escribirLote(ops);
           }
         } catch (err) {
           alert('El archivo no es una copia de seguridad válida.');
@@ -622,9 +1009,10 @@
 
     // Los botones usan onclick="..." en el HTML, por eso las funciones se exponen en window
     Object.assign(window, {
-      renderizar, filtrar, descontar, descontarPersonalizado, abrirModal, cerrarModal,
-      guardarCanto, editarCanto, eliminarCanto, exportarDatos, importarDatos,
-      cerrarSesion, subirLocal, omitirMigracion
+      renderizar, filtrar, cambiarVista, agregarSegunVista, cerrarElegir,
+      descontar, descontarPersonalizado, abrirModal, cerrarModal, guardarCanto, editarCanto, eliminarCanto,
+      descontarPlaca, descontarPlacaPersonalizado, abrirModalPlaca, cerrarModalPlaca, guardarPlaca, editarPlaca, eliminarPlaca,
+      exportarDatos, importarDatos, cerrarSesion, subirLocal, omitirMigracion
     });
 
     // Service worker (necesario para poder instalar la app)
