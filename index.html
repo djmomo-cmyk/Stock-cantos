@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Stock Cantos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Configuración PWA -->
+  <meta name="theme-color" content="#0f172a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Stock Cantos">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+  <style>
+    body { -webkit-tap-highlight-color: transparent; user-select: none; }
+    input, select { user-select: text; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-20 font-sans">
+
+  <!-- Header principal -->
+  <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-30 shadow-lg">
+    <div class="max-w-xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid font-bold text-amber-500 text-xl fa-layer-group"></i>
+        <h1 class="font-bold text-lg tracking-wide text-white">Stock Cantos PVC</h1>
+      </div>
+      <button onclick="abrirModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 shadow-md active:scale-95 transition-all">
+        <i class="fa-solid fa-plus"></i> Nuevo Canto
+      </button>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="max-w-xl mx-auto px-4 py-4 space-y-4">
+
+    <!-- Tarjetas Resumen -->
+    <div class="grid grid-cols-3 gap-2 text-center">
+      <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl shadow">
+        <p class="text-xs text-slate-400 font-medium">Rollos</p>
+        <p id="stat-total-rollos" class="text-xl font-black text-amber-400 mt-1">0</p>
+      </div>
+      <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl shadow">
+        <p class="text-xs text-slate-400 font-medium">Total Metros</p>
+        <p id="stat-total-metros" class="text-xl font-black text-emerald-400 mt-1">0m</p>
+      </div>
+      <div class="bg-slate-800 border border-slate-700 p-3 rounded-xl shadow">
+        <p class="text-xs text-slate-400 font-medium">Stock Bajo</p>
+        <p id="stat-stock-bajo" class="text-xl font-black text-rose-400 mt-1">0</p>
+      </div>
+    </div>
+
+    <!-- Buscador y Filtros -->
+    <div class="space-y-2">
+      <div class="relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-sm"></i>
+        <input type="text" id="input-buscar" oninput="renderizar()" placeholder="Buscar por color, marca o veta..." class="w-full pl-9 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm focus:outline-none focus:border-amber-500 text-slate-100 placeholder-slate-400">
+      </div>
+
+      <div class="flex gap-2 overflow-x-auto pb-1 text-xs no-scrollbar">
+        <button onclick="filtrar('todos')" id="filtro-todos" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold whitespace-nowrap">Todos</button>
+        <button onclick="filtrar('0.4')" id="filtro-0.4" class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-medium whitespace-nowrap">0.4 mm</button>
+        <button onclick="filtrar('1')" id="filtro-1" class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-medium whitespace-nowrap">1 mm</button>
+        <button onclick="filtrar('2')" id="filtro-2" class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-medium whitespace-nowrap">2 mm</button>
+        <button onclick="filtrar('alerta')" id="filtro-alerta" class="px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-rose-400 font-medium whitespace-nowrap"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Poco stock</button>
+      </div>
+    </div>
+
+    <!-- Lista de Cantos -->
+    <div id="lista-cantos" class="space-y-3">
+      <!-- Los cantos se cargan dinámicamente con JavaScript -->
+    </div>
+
+    <!-- Copia de seguridad -->
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-3 space-y-2">
+      <p class="text-xs text-slate-400 font-medium"><i class="fa-solid fa-shield-halved mr-1 text-amber-500"></i>Copia de seguridad</p>
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="exportarDatos()" class="py-2 bg-slate-700 hover:bg-slate-600 active:scale-95 rounded-lg font-bold text-xs text-slate-200 border border-slate-600 transition-all">
+          <i class="fa-solid fa-download mr-1"></i> Exportar
+        </button>
+        <button onclick="document.getElementById('input-importar').click()" class="py-2 bg-slate-700 hover:bg-slate-600 active:scale-95 rounded-lg font-bold text-xs text-slate-200 border border-slate-600 transition-all">
+          <i class="fa-solid fa-upload mr-1"></i> Importar
+        </button>
+      </div>
+      <input type="file" id="input-importar" accept=".json,application/json" class="hidden" onchange="importarDatos(event)">
+    </div>
+
+  </main>
+
+  <!-- Modal para Agregar / Editar Canto -->
+  <div id="modal-canto" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-md p-5 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+        <h3 id="modal-titulo" class="font-bold text-lg text-amber-400">Nuevo Canto</h3>
+        <button onclick="cerrarModal()" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="form-canto" onsubmit="guardarCanto(event)" class="space-y-3">
+        <input type="hidden" id="canto-id">
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Color / Diseño / Veta *</label>
+          <input type="text" id="canto-color" required placeholder="Ej: Blanco Puro, Roble Americano" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Espesor (mm) *</label>
+            <select id="canto-espesor" required class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+              <option value="0.4">0.4 mm</option>
+              <option value="1">1.0 mm</option>
+              <option value="2">2.0 mm</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Ancho (mm) *</label>
+            <input type="number" id="canto-ancho" required value="22" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Metros Restantes *</label>
+            <input type="number" id="canto-metros" required step="0.5" min="0" placeholder="Ej: 50" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Alerta Mínimo (m)</label>
+            <input type="number" id="canto-minimo" value="15" min="0" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Marca / Proveedor</label>
+            <input type="text" id="canto-marca" placeholder="Ej: Egger, Rehau, Faplac" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Ubicación / Estante</label>
+            <input type="text" id="canto-ubicacion" placeholder="Ej: Estante A2" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+
+        <div class="pt-2 flex gap-2">
+          <button type="button" onclick="cerrarModal()" class="w-1/2 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-bold text-sm text-slate-200">Cancelar</button>
+          <button type="submit" class="w-1/2 py-2 bg-amber-500 hover:bg-amber-600 rounded-lg font-bold text-sm text-slate-950">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Datos de ejemplo iniciales (solo la primera vez que se abre la app)
+    const iniciales = [
+      { id: '1', color: 'Blanco Negro / Egger', espesor: '0.4', ancho: '22', metros: 85, minimo: 20, marca: 'Egger', ubicacion: 'Estante 1' },
+      { id: '2', color: 'Roble Natural', espesor: '2', ancho: '22', metros: 12, minimo: 15, marca: 'Rehau', ubicacion: 'Estante 2' },
+      { id: '3', color: 'Gris Grafito', espesor: '1', ancho: '45', metros: 40, minimo: 10, marca: 'Faplac', ubicacion: 'Estante 1' }
+    ];
+
+    function cargarStorage() {
+      try {
+        const guardado = localStorage.getItem('stock_cantos');
+        if (guardado === null) return iniciales;
+        const datos = JSON.parse(guardado);
+        return Array.isArray(datos) ? datos : iniciales;
+      } catch (e) {
+        return iniciales;
+      }
+    }
+
+    let cantos = cargarStorage();
+    let filtroActual = 'todos';
+
+    function guardarEnStorage() {
+      try {
+        localStorage.setItem('stock_cantos', JSON.stringify(cantos));
+      } catch (e) {
+        alert('No se pudo guardar en este dispositivo.');
+      }
+    }
+
+    // Evita que un texto con < > & rompa la pantalla
+    function esc(texto) {
+      return String(texto ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function renderizar() {
+      const lista = document.getElementById('lista-cantos');
+      const busqueda = document.getElementById('input-buscar').value.toLowerCase();
+      lista.innerHTML = '';
+
+      let totalMetros = 0;
+      let stockBajoCount = 0;
+
+      const filtrados = cantos.filter(c => {
+        const coincideText =
+          String(c.color).toLowerCase().includes(busqueda) ||
+          (c.marca && String(c.marca).toLowerCase().includes(busqueda)) ||
+          (c.ubicacion && String(c.ubicacion).toLowerCase().includes(busqueda));
+
+        let coincideFiltro = true;
+        if (filtroActual === '0.4') coincideFiltro = String(c.espesor) === '0.4';
+        else if (filtroActual === '1') coincideFiltro = String(c.espesor) === '1';
+        else if (filtroActual === '2') coincideFiltro = String(c.espesor) === '2';
+        else if (filtroActual === 'alerta') coincideFiltro = parseFloat(c.metros) <= parseFloat(c.minimo);
+
+        return coincideText && coincideFiltro;
+      });
+
+      // Las estadísticas cuentan todo el stock, no solo lo filtrado
+      cantos.forEach(c => {
+        totalMetros += parseFloat(c.metros) || 0;
+        if (parseFloat(c.metros) <= parseFloat(c.minimo)) stockBajoCount++;
+      });
+
+      document.getElementById('stat-total-rollos').innerText = cantos.length;
+      document.getElementById('stat-total-metros').innerText = Math.round(totalMetros) + 'm';
+      document.getElementById('stat-stock-bajo').innerText = stockBajoCount;
+
+      if (filtrados.length === 0) {
+        lista.innerHTML = `<div class="text-center py-10 text-slate-500 text-sm">No se encontraron rollos de canto.</div>`;
+        return;
+      }
+
+      filtrados.forEach(c => {
+        const esBajo = parseFloat(c.metros) <= parseFloat(c.minimo);
+        const item = document.createElement('div');
+        item.className = `bg-slate-800 border ${esBajo ? 'border-rose-500/50' : 'border-slate-700'} p-4 rounded-xl shadow-md space-y-3`;
+
+        item.innerHTML = `
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h4 class="font-bold text-white text-base">${esc(c.color)}</h4>
+                ${esBajo ? '<span class="bg-rose-500/20 text-rose-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-rose-500/30">STOCK BAJO</span>' : ''}
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5">${esc(c.marca) || 'Sin marca'} • Ubicación: ${esc(c.ubicacion) || 'General'}</p>
+            </div>
+            <div class="flex gap-1">
+              <button onclick="editarCanto('${esc(c.id)}')" class="text-slate-400 hover:text-amber-400 p-1.5"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button onclick="eliminarCanto('${esc(c.id)}')" class="text-slate-400 hover:text-rose-400 p-1.5"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+            <div class="flex gap-3 text-xs">
+              <span class="bg-slate-800 text-amber-400 px-2 py-1 rounded font-semibold border border-slate-700">${esc(c.ancho)}x${esc(c.espesor)} mm</span>
+            </div>
+            <div class="text-right">
+              <span class="text-lg font-black ${esBajo ? 'text-rose-400' : 'text-emerald-400'}">${esc(c.metros)}m</span>
+              <span class="text-[10px] text-slate-500 block">mín: ${esc(c.minimo)}m</span>
+            </div>
+          </div>
+
+          <!-- Botones de Descuento Rápido -->
+          <div class="flex items-center justify-between pt-1 gap-2">
+            <span class="text-xs text-slate-400 font-medium">Descontar uso:</span>
+            <div class="flex gap-1.5">
+              <button onclick="descontar('${esc(c.id)}', 5)" class="bg-slate-700 hover:bg-slate-600 active:scale-95 text-slate-200 text-xs px-2.5 py-1 rounded-lg font-bold border border-slate-600">-5m</button>
+              <button onclick="descontar('${esc(c.id)}', 10)" class="bg-slate-700 hover:bg-slate-600 active:scale-95 text-slate-200 text-xs px-2.5 py-1 rounded-lg font-bold border border-slate-600">-10m</button>
+              <button onclick="descontarPersonalizado('${esc(c.id)}')" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 active:scale-95 text-xs px-2.5 py-1 rounded-lg font-bold border border-amber-500/30">Otro</button>
+            </div>
+          </div>
+        `;
+        lista.appendChild(item);
+      });
+    }
+
+    function filtrar(tipo) {
+      filtroActual = tipo;
+      document.querySelectorAll('[id^="filtro-"]').forEach(btn => {
+        const esAlerta = btn.id === 'filtro-alerta';
+        btn.className = `px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 ${esAlerta ? 'text-rose-400' : 'text-slate-300'} font-medium whitespace-nowrap`;
+      });
+      const btnActivo = document.getElementById(`filtro-${tipo}`);
+      if (btnActivo) btnActivo.className = 'px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold whitespace-nowrap';
+      renderizar();
+    }
+
+    function descontar(id, cantidad) {
+      const canto = cantos.find(c => c.id === id);
+      if (canto) {
+        canto.metros = Math.max(0, parseFloat(canto.metros) - cantidad);
+        guardarEnStorage();
+        renderizar();
+      }
+    }
+
+    function descontarPersonalizado(id) {
+      const canto = cantos.find(c => c.id === id);
+      if (!canto) return;
+      const cant = prompt(`¿Cuántos metros usaste de ${canto.color}?`, '15');
+      if (cant === null) return;
+      const n = parseFloat(String(cant).replace(',', '.'));
+      if (!isNaN(n) && n > 0) {
+        canto.metros = Math.max(0, parseFloat(canto.metros) - n);
+        guardarEnStorage();
+        renderizar();
+      }
+    }
+
+    function abrirModal(id = null) {
+      document.getElementById('modal-canto').classList.remove('hidden');
+      if (id) {
+        const c = cantos.find(item => item.id === id);
+        if (!c) return;
+        document.getElementById('modal-titulo').innerText = 'Editar Canto';
+        document.getElementById('canto-id').value = c.id;
+        document.getElementById('canto-color').value = c.color;
+        document.getElementById('canto-espesor').value = c.espesor;
+        document.getElementById('canto-ancho').value = c.ancho;
+        document.getElementById('canto-metros').value = c.metros;
+        document.getElementById('canto-minimo').value = c.minimo;
+        document.getElementById('canto-marca').value = c.marca || '';
+        document.getElementById('canto-ubicacion').value = c.ubicacion || '';
+      } else {
+        document.getElementById('modal-titulo').innerText = 'Nuevo Canto';
+        document.getElementById('form-canto').reset();
+        document.getElementById('canto-id').value = '';
+      }
+    }
+
+    function cerrarModal() {
+      document.getElementById('modal-canto').classList.add('hidden');
+    }
+
+    function guardarCanto(e) {
+      e.preventDefault();
+      const id = document.getElementById('canto-id').value;
+      const minimo = parseFloat(document.getElementById('canto-minimo').value);
+      const nuevo = {
+        id: id || Date.now().toString(),
+        color: document.getElementById('canto-color').value.trim(),
+        espesor: document.getElementById('canto-espesor').value,
+        ancho: document.getElementById('canto-ancho').value,
+        metros: parseFloat(document.getElementById('canto-metros').value),
+        minimo: isNaN(minimo) ? 10 : minimo,
+        marca: document.getElementById('canto-marca').value.trim(),
+        ubicacion: document.getElementById('canto-ubicacion').value.trim()
+      };
+
+      if (id) {
+        const index = cantos.findIndex(c => c.id === id);
+        if (index !== -1) cantos[index] = nuevo;
+      } else {
+        cantos.unshift(nuevo);
+      }
+
+      guardarEnStorage();
+      cerrarModal();
+      renderizar();
+    }
+
+    function editarCanto(id) { abrirModal(id); }
+
+    function eliminarCanto(id) {
+      if (confirm('¿Eliminar este canto del stock?')) {
+        cantos = cantos.filter(c => c.id !== id);
+        guardarEnStorage();
+        renderizar();
+      }
+    }
+
+    // ---- Copia de seguridad ----
+    function exportarDatos() {
+      const fecha = new Date().toISOString().slice(0, 10);
+      const contenido = JSON.stringify({ app: 'stock-cantos', version: 1, exportado: new Date().toISOString(), cantos }, null, 2);
+      const blob = new Blob([contenido], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `stock-cantos-${fecha}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function importarDatos(e) {
+      const archivo = e.target.files[0];
+      e.target.value = ''; // permite elegir el mismo archivo otra vez
+      if (!archivo) return;
+
+      const lector = new FileReader();
+      lector.onload = () => {
+        try {
+          const datos = JSON.parse(lector.result);
+          const lista = Array.isArray(datos) ? datos : datos.cantos;
+          if (!Array.isArray(lista)) throw new Error('formato');
+
+          const validos = lista
+            .filter(c => c && typeof c === 'object' && c.color !== undefined && !isNaN(parseFloat(c.metros)))
+            .map((c, i) => ({
+              id: String(c.id ?? (Date.now() + i)),
+              color: String(c.color),
+              espesor: String(c.espesor ?? '0.4'),
+              ancho: String(c.ancho ?? '22'),
+              metros: parseFloat(c.metros),
+              minimo: isNaN(parseFloat(c.minimo)) ? 10 : parseFloat(c.minimo),
+              marca: String(c.marca ?? ''),
+              ubicacion: String(c.ubicacion ?? '')
+            }));
+
+          if (validos.length === 0) throw new Error('vacio');
+
+          if (confirm(`Se van a reemplazar los ${cantos.length} cantos actuales por ${validos.length} del archivo. ¿Continuar?`)) {
+            cantos = validos;
+            guardarEnStorage();
+            renderizar();
+          }
+        } catch (err) {
+          alert('El archivo no es una copia de seguridad válida.');
+        }
+      };
+      lector.onerror = () => alert('No se pudo leer el archivo.');
+      lector.readAsText(archivo);
+    }
+
+    // Inicio
+    renderizar();
+
+    // Service worker (necesario para poder instalar la app)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW no registrado:', err));
+      });
+    }
+  </script>
+</body>
+</html>
